@@ -1,0 +1,42 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: ms-egresos
+  datasource:
+    url: jdbc:oracle:thin:@mmg8hvewk688yrh4_low?TNS_ADMIN=C:/Users/usuario/Downloads/Sistema-Bodegas.v1.2.3/Sistema-Bodegas.v1/Sistema-Bodegas-main/ms-egresos/src/main/resources/wallet
+    username: SCHEMA_EGRESOS
+    password: FullStack-Bodega1
+    driver-class-name: oracle.jdbc.OracleDriver
+  jpa:
+    database-platform: org.hibernate.dialect.OracleDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+# Variables dinámicas para URLs de microservicios
+ms:
+  productos:
+    url: ${MS_PRODUCTOS_URL:http://ms-productos:8082}
+  kardex:
+    url: ${MS_KARDEX_URL:http://ms-kardex:8086}
+
+# Configuración de documentación con Swagger / OpenApi
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+
+# Integración con el Servidor de Descubrimiento Eureka
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://eureka-server:8761/eureka/}
