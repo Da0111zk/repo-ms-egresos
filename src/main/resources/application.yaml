@@ -1,31 +1,31 @@
 server:
   port: 8083
+  error:
+    include-message: always
 
 spring:
   application:
     name: ms-egresos
   datasource:
-    url: jdbc:oracle:thin:@mmg8hvewk688yrh4_low?TNS_ADMIN=C:/Users/usuario/Downloads/Sistema-Bodegas.v1.2.3/Sistema-Bodegas.v1/Sistema-Bodegas-main/ms-egresos/src/main/resources/wallet
-    username: SCHEMA_EGRESOS
-    password: FullStack-Bodega1
+    url: ${SPRING_DATASOURCE_URL:jdbc:oracle:thin:@mmg8hvewk688yrh4_low?TNS_ADMIN=/app/wallet}
+    username: ${SPRING_DATASOURCE_USERNAME:SCHEMA_EGRESOS}
+    password: ${SPRING_DATASOURCE_PASSWORD:FullStack-Bodega1}
     driver-class-name: oracle.jdbc.OracleDriver
+    hikari:
+      maximum-pool-size: ${SPRING_DATASOURCE_HIKARI_MAXIMUMPOOLSIZE:2}
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      auto-commit: true
   jpa:
     database-platform: org.hibernate.dialect.OracleDialect
     hibernate:
-      ddl-auto: update
-    show-sql: true
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+    show-sql: ${SPRING_JPA_SHOW_SQL:true}
     properties:
       hibernate:
         format_sql: true
 
-# Variables dinámicas para URLs de microservicios
-ms:
-  productos:
-    url: ${MS_PRODUCTOS_URL:http://ms-productos:8082}
-  kardex:
-    url: ${MS_KARDEX_URL:http://ms-kardex:8086}
-
-# Configuración de documentación con Swagger / OpenApi
 springdoc:
   api-docs:
     path: /api-docs
@@ -33,10 +33,28 @@ springdoc:
     path: /swagger-ui.html
     operationsSorter: method
 
-# Integración con el Servidor de Descubrimiento Eureka
 eureka:
-  instance:
-    prefer-ip-address: true
   client:
     service-url:
-      defaultZone: ${EUREKA_URL:http://eureka-server:8761/eureka/}
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka}
+    register-with-eureka: true
+    fetch-registry: true
+    enabled: true
+    healthcheck:
+      enabled: true
+instance:
+    prefer-ip-address: false
+    hostname: ${EUREKA_INSTANCE_HOSTNAME:ms-egresos.onrender.com}
+    instance-id: ${spring.application.name}:${random.value}
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
